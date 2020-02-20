@@ -12,31 +12,22 @@ public class GamePanel extends JPanel {
 
 	private static final long serialVersionUID = -5444461222633800021L;
 	private final TilePanel[][] tiles;
-	private final int width, height, scale = 100;
+	protected final int width, height;
 
 	public GamePanel(Game game) {
-		setLayout(null);
+//		setLayout(null);
 		int[][] board = game.getBoard();
 		width = game.getSize().width;
 		height = game.getSize().height;
 		tiles = new TilePanel[width][height];
+		int scale = 100;
 		for(int y = 0 ; y < height ; y++) {
 			for(int x = 0 ; x < width ; x++) {
-				tiles[x][y] = new TilePanel(x, y, board[x][y], scale);
+				tiles[x][y] = new TilePanel(x, y, board[x][y], this);
 				add(tiles[x][y]);
 				tiles[x][y].setBounds(x*scale, y*scale, scale, scale);
 			}
 		}
-	}
-	
-	public void updateTiles(Game game) {
-		int[][] board = game.getBoard();
-		for(int y = 0 ; y < height ; y++) {
-			for(int x = 0 ; x < width ; x++) {
-				tiles[x][y].setN(board[x][y]);
-			}
-		}
-		repaint();
 	}
 	
 	public void makeMove(Game game, Move move) {

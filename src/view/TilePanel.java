@@ -14,24 +14,26 @@ import model.Move;
 public class TilePanel extends JPanel {
 
 	private static final long serialVersionUID = -662251637153041228L;
-	private int x, y, scale;
-	private int n;
+	private int x, y;
+	private final int n;
+	private final GamePanel gp;
+	private boolean moving = false;
 
-	public void setN(int n) {
-		this.n = n;
-	}
-
-	public TilePanel (int x, int y, int n, int scale) {
+	public TilePanel (int x, int y, int n, GamePanel gp) {
 		setLayout(null);
 		this.x = x;
 		this.y = y;
-		this.scale = scale;
 		this.n = n;
+		this.gp = gp;
 	}
 	
 	@Override
 	public void paintComponent(Graphics g) {
 		if (n>0) {
+			if (!moving) {
+				int scale = Math.min(gp.getWidth()/gp.width, gp.getHeight()/gp.height);
+				setBounds(x*scale, y*scale, scale, scale);
+			}
 			Graphics2D g2 = (Graphics2D) g;
 			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
 					RenderingHints.VALUE_ANTIALIAS_ON);
@@ -51,57 +53,42 @@ public class TilePanel extends JPanel {
 	}
 	
 	public void makeMove(Point move) {
+		moving = true;
+		int scale = Math.min(gp.getWidth()/gp.width, gp.getHeight()/gp.height);
+		int step = scale/100;
 		if (move.x > x) {
-			for (int i = 0 ; i < scale ; i++) {
-				setLocation(x*scale+i, y*scale);
-				try {
-					Thread.sleep(2);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+			for (int i = 0 ; i < scale ; i+=step) {
+				moveTo(x*scale+i, y*scale);
 			}
 		} else if (move.x < x) {
-			for (int i = 0 ; i < scale ; i++) {
-				setLocation(x*scale-i, y*scale);
-				try {
-					Thread.sleep(2);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+			for (int i = 0 ; i < scale ; i+=step) {
+				moveTo(x*scale-i, y*scale);
 			}
 		} else if (move.y > y) {
-			for (int i = 0 ; i < scale ; i++) {
-				setLocation(x*scale, y*scale+i);
-				
-				try {
-					Thread.sleep(2);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+			for (int i = 0 ; i < scale ; i+=step) {
+				moveTo(x*scale, y*scale+i);
 			}
 		} else  {
-			for (int i = 0 ; i < scale ; i++) {
-				setLocation(x*scale, y*scale-i);
-				
-				try {
-					Thread.sleep(2);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+			for (int i = 0 ; i < scale ; i+=step) {
+				moveTo(x*scale, y*scale-i);
 			}
-		} 
-		
-
+		}
 		x = move.x;
 		y = move.y;
 		setBounds(x*scale, y*scale, scale, scale);
+		moving = false;
 		repaint();
 	}
-	
+
+	private void moveTo(int x, int y) {
+		setLocation(x, y);
+		try {
+			Thread.sleep(0, 500000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+
 	public Move getMove() {
 		return new Move(x, y);
 	}
